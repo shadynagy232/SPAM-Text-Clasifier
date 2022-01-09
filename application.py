@@ -1,7 +1,6 @@
 import os
 import re
 import string
-import numpy as np
 from keras.models import load_model
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
@@ -39,12 +38,12 @@ class messageClassification:
         with open(self.cd + "\\tokenizer.pickle", "rb") as handle:
             tokenizer = pickle.load(handle)
         testText = tokenizer.texts_to_sequences(testText)
-        testText = pad_sequences(testText, maxlen=300)
-        pred = loadedModel.predict(testText)
-        eval_results = []
-        for i in range(0, len(pred)):
-            eval_results.append(int(np.argmax(pred[i])))
-        if eval_results[0] == 1:
+        testText = pad_sequences(testText, maxlen=442)
+        threshold = 0.5
+        result = loadedModel.predict(testText, verbose=2)
+        result = result > threshold
+        result = result.astype(int)
+        if result[0] == 1:
             return "Spam"
-        elif eval_results[0] == 0:
+        elif result[0] == 0:
             return "Ham"
